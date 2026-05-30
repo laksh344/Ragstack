@@ -1,8 +1,9 @@
 # RAGStack — Agentic RAG Platform
 
-> Production RAG platform with multi-modal document understanding, hybrid search, a LangGraph agent, LangSmith observability, guardrails, and GCP Cloud Run deployment.
+> Production RAG platform: multi-modal ingestion, hybrid search with reranking, a LangGraph agent, provider-configurable LLM routing (Google Gemini / OpenAI / Cohere), LangSmith observability, guardrails, API-key auth, and GCP Cloud Run deployment.
 
 [![CI](https://github.com/laksh344/Ragstack/actions/workflows/ci.yml/badge.svg)](https://github.com/laksh344/Ragstack/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-156_passing-brightgreen.svg)](https://github.com/laksh344/Ragstack/actions/workflows/ci.yml)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://python.org)
 [![LangChain Certified ×3](https://img.shields.io/badge/LangChain-Certified×3-green.svg)](https://langchain.com)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-yellow.svg)](LICENSE)
@@ -23,22 +24,23 @@
 
 [Watch the 97-second MP4 demo](docs/assets/ragstack-demo.mp4)
 
-The demo shows a PDF upload, indexing into the knowledge base, and an agentic chat answer with page-level citations.
+**What you'll see:** `0:00` upload a PDF · `~0:30` parse → chunk → embed → index into Qdrant + Elasticsearch · `~0:50` an agentic chat answer with page-level citations.
 
 ---
 
 ## Features
 
-- **Multi-modal ingestion** — PDF (PyMuPDF + table detection), DOCX, CSV/XLSX, TXT; optional GPT-4o Vision for tables and images
+- **Multi-modal ingestion** — PDF (PyMuPDF + table detection), DOCX, CSV/XLSX, TXT; optional vision extraction (GPT-4o) for tables/images when running the OpenAI provider
+- **Provider-configurable LLM routing** — swap chat + embedding backends between **Google Gemini (default)**, OpenAI, and Cohere with a single env var, behind one `get_llm()` / `get_embeddings()` factory
 - **Hybrid search** — Qdrant vector search + Elasticsearch BM25, fused with Reciprocal Rank Fusion (RRF)
-- **Cross-encoder reranking** — Cohere Rerank v3 with graceful fallback
-- **LangGraph agent** — intent router, KB retriever, Tavily web search fallback, structured-output generator, guardrails node
-- **Streaming chat** — SSE token-by-token response with inline citations
-- **Conversation history** — Redis-backed multi-turn context (24h TTL)
-- **Full guardrails suite** — Presidio PII detection/redaction, LLM-as-judge hallucination detection, prompt injection filter, token budget tracking
-- **LangSmith observability** — every pipeline step traced; custom faithfulness, relevance, and citation evaluators
-- **Evaluation suite** — 20 hand-crafted golden QA pairs; CLI runner with A/B comparison
-- **Production deployment** — multi-stage Dockerfile, GCP Cloud Run, Terraform IaC, GitHub Actions CI/CD
+- **Cross-encoder reranking** — Cohere Rerank v3 with graceful fallback to RRF
+- **LangGraph agent** — intent router, KB retriever, Tavily web-search fallback, structured-output generator, guardrails node
+- **Streaming chat** — SSE token-by-token responses with page-level citations and Redis-backed multi-turn history (24h TTL)
+- **Guardrails** — Presidio PII **redacted from the query before it reaches the LLM** (not just responses), prompt-injection blocked pre-generation, hallucination grounding checks, token-budget cost tracking
+- **Production security** — opt-in API-key auth with per-user conversation isolation, CORS allowlist, path-traversal-safe uploads with streamed size limits
+- **LangSmith observability** — every pipeline step traced; four custom evaluators (faithfulness, answer/retrieval relevance, citation accuracy)
+- **Evaluation harness** — 20 hand-crafted golden QA pairs; CLI runner with A/B comparison between configs
+- **Production deployment** — multi-stage Dockerfile, GCP Cloud Run, Terraform IaC, GitHub Actions CI
 
 ---
 
@@ -47,7 +49,7 @@ The demo shows a PDF upload, indexing into the knowledge base, and an agentic ch
 ```bash
 # 1. Clone and configure
 git clone https://github.com/laksh344/Ragstack.git && cd Ragstack
-cp .env.example .env          # add OPENAI_API_KEY, LANGCHAIN_API_KEY, etc.
+cp .env.example .env          # add GOOGLE_API_KEY (default provider) + LANGCHAIN_API_KEY, etc.
 
 # 2. Start infrastructure (Qdrant, Elasticsearch, Redis)
 make docker-up
@@ -60,7 +62,7 @@ make dev                      # → http://localhost:8000
 cd frontend && npm install && npm run dev   # → http://localhost:3000
 ```
 
-> **Minimum required:** `OPENAI_API_KEY`. Everything else degrades gracefully.
+> **Minimum required:** `GOOGLE_API_KEY` (the default provider). Switch backends with `LLM_PROVIDER` / `EMBEDDING_PROVIDER` = `google` | `openai` | `cohere`. Cohere, Tavily, and LangSmith keys are optional — each degrades gracefully if absent.
 
 ---
 
@@ -69,16 +71,17 @@ cd frontend && npm install && npm run dev   # → http://localhost:3000
 | Layer | Technology |
 |---|---|
 | LLM Orchestration | LangChain + LangGraph |
+| LLM & Embeddings | Google Gemini (default) · OpenAI · Cohere — provider-configurable |
 | Observability | LangSmith |
 | Vector DB | Qdrant |
 | Keyword Search | Elasticsearch (BM25) |
 | Reranker | Cohere Rerank v3 |
 | Backend | FastAPI (Python 3.12) + uvicorn |
-| Frontend | Next.js 14 + Tailwind CSS |
+| Frontend | Next.js 16 + Tailwind CSS |
 | Document Parsing | PyMuPDF + python-docx + pandas |
-| PII Detection | Microsoft Presidio |
+| PII Detection | Microsoft Presidio (+ regex fallback) |
 | Web Search | Tavily |
-| Cache | Redis |
+| Cache / Sessions | Redis |
 | Infra | Docker Compose → GCP Cloud Run |
 | IaC | Terraform |
 | CI/CD | GitHub Actions |
@@ -103,26 +106,26 @@ Full OpenAPI docs at `/docs` when the server is running.
 
 ---
 
-## Evaluation Results
+## Evaluation
 
-Baseline measurements on the 20-item golden QA dataset (recursive chunking, GPT-4o, Cohere reranker):
+RAGStack treats evaluation as a first-class part of the pipeline, not an afterthought. Four custom evaluators score every answer against a 20-item, hand-built golden dataset:
 
-| Metric | Score |
+| Evaluator | What it measures |
 |---|---|
-| Faithfulness | 0.84 |
-| Answer Relevance | 0.79 |
-| Retrieval Relevance | 0.81 |
-| Citation Accuracy | 0.91 |
-| Avg Latency | 2.1s |
+| **Faithfulness** | Is the answer grounded in the retrieved context? |
+| **Answer Relevance** | Does the answer actually address the question? |
+| **Retrieval Relevance** | Are the retrieved chunks on-topic for the query? |
+| **Citation Accuracy** | Do the cited sources map to real retrieved chunks? |
 
-Adding Cohere reranking improved faithfulness from **0.71 → 0.84** (+18pp). Semantic chunking vs recursive: **0.84 vs 0.78** retrieval relevance, at 3× ingestion cost.
+Each evaluator runs in two modes: a **deterministic word-overlap mode** for fast CI checks (no API calls), and an **LLM-as-judge mode** for high-fidelity scoring. `compare.py` produces side-by-side A/B diffs between configurations — recursive vs semantic chunking, reranker on/off — which is the "I A/B-test my RAG pipeline" story behind the design.
 
-Run your own:
 ```bash
-make eval                                          # full suite
-python eval/run_eval.py --subset 5 --no-llm        # fast smoke test
-python eval/compare.py results/run_a.json results/run_b.json --by-category
+make eval                                    # full suite (LLM-as-judge)
+python eval/run_eval.py --subset 5 --no-llm  # fast, deterministic smoke test
+python eval/compare.py run_a.json run_b.json --by-category --by-difficulty
 ```
+
+> **Sample output** (illustrative targets — recursive chunking + Cohere rerank): faithfulness ≈ 0.84, answer relevance ≈ 0.79, retrieval relevance ≈ 0.81, citation accuracy ≈ 0.91. These are reference targets for the methodology — run `make eval` to produce live, timestamped numbers on your own corpus.
 
 ---
 
@@ -151,10 +154,20 @@ Max 3 iterations guard; structured LLM output at every decision point; full Lang
 
 ### Guardrails
 
-1. **Input** — regex injection patterns + toxic keyword list; query length cap
-2. **PII** — Microsoft Presidio (`en_core_web_lg`) with regex fallback; redacts email, phone, SSN, CC
-3. **Hallucination** — single batched LLM-as-judge call; word-overlap fallback; threshold 0.3
-4. **Token budget** — tiktoken counting, GPT-4o pricing, LangSmith metadata
+1. **Input** — prompt-injection patterns blocked **before** generation (the agent never sees a flagged query); toxic-keyword + length checks
+2. **PII** — Microsoft Presidio (`en_core_web_lg`) with regex fallback; the query is **redacted before it reaches the LLM or embeddings**, and responses are scrubbed too (email, phone, SSN, credit card)
+3. **Hallucination** — word-overlap grounding by default (deterministic, no extra LLM call); optional batched LLM-as-judge; flags answers below the grounding threshold (0.3)
+4. **Token budget** — tiktoken counting with per-model pricing, logged to LangSmith metadata
+
+### Security
+
+Designed for an internet-facing deployment, not just localhost:
+
+- **Opt-in API-key auth** — every data/compute endpoint is gated by a `require_auth` dependency, enabled by setting `API_KEYS` (local dev stays open and frictionless). Each key maps to a stable, opaque user id.
+- **Per-user isolation** — conversations are namespaced by user in Redis, so one user can never read another's history (closes an IDOR).
+- **Safe uploads** — filenames are sanitized against path traversal and the body is size-capped **while streaming**, so an oversized upload is rejected before it can fill the disk.
+- **CORS allowlist** — explicit origins from config; never `*`-with-credentials.
+- **Secrets** — environment-only locally, GCP Secret Manager in production; `/health` never echoes connection credentials.
 
 ---
 
@@ -196,7 +209,7 @@ terraform apply \
   -var="langchain_api_key=$LANGCHAIN_API_KEY"
 ```
 
-CI/CD auto-deploys on push to `main` via `.github/workflows/deploy.yml`.
+CI (lint + type-check + 156 tests) runs on every push/PR. Deployment is a **manual GitHub Action** (`workflow_dispatch`) that builds the image and ships to Cloud Run once the GCP secrets are configured — see [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
 
 ---
 
@@ -211,7 +224,7 @@ ragstack/
 │   ├── agent/         # LangGraph graph + 5 nodes + state
 │   ├── guardrails/    # PII, hallucination, input validation, token budget
 │   └── observability/ # LangSmith tracing + evaluators + datasets
-├── frontend/          # Next.js 14 + Tailwind — chat UI + upload
+├── frontend/          # Next.js 16 + Tailwind — chat UI, upload, light/dark theme
 ├── eval/              # CLI runner + A/B comparison + golden QA dataset
 ├── terraform/         # GCP Cloud Run IaC
 ├── tests/             # 156 unit tests (zero external services required)
@@ -231,8 +244,8 @@ See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) for the full rationale 
 - [LangChain](https://langchain.com) — Certified ×3 (LangChain, LangGraph, LangSmith)
 - [LangGraph](https://langchain-ai.github.io/langgraph/) — Agent state machine
 - [LangSmith](https://smith.langchain.com) — Observability and evaluation
+- [Google Gemini](https://ai.google.dev/) / [OpenAI](https://openai.com) / [Cohere](https://cohere.com) — provider-configurable LLM + embeddings + reranking
 - [Qdrant](https://qdrant.tech) — Vector database
-- [Cohere](https://cohere.com) — Reranking
 - [Microsoft Presidio](https://microsoft.github.io/presidio/) — PII detection
 
 ---
