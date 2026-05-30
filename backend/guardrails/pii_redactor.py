@@ -9,6 +9,7 @@ Two modes:
 """
 
 import re
+
 import structlog
 
 from backend.guardrails import PiiResult
@@ -133,4 +134,6 @@ class PiiRedactor:
             if pattern.search(redacted):
                 found.append(name)
                 redacted = pattern.sub(f"<{name}>", redacted)
-        return PiiResult(detected=bool(found), entity_types=found, redacted_text=redacted, engine="regex")
+        return PiiResult(
+            detected=bool(found), entity_types=found, redacted_text=redacted, engine="regex"
+        )

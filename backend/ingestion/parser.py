@@ -7,17 +7,23 @@ Reference: RAGFlow's deepdoc/parser/ splits by format similarly,
 but we use PyMuPDF + python-docx instead of their custom C++ parsers.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import structlog
 
+if TYPE_CHECKING:
+    from backend.models.document import ParsedDocument
+
 logger = structlog.get_logger()
 
 
-def parse_document(file_path: str | Path) -> "ParsedDocument":
+def parse_document(file_path: str | Path) -> ParsedDocument:
     """Route to the correct parser based on file extension."""
-    from backend.models.document import FileType, ParsedDocument
+    from backend.models.document import FileType
 
     path = Path(file_path)
     file_type = FileType.from_extension(path.suffix)
@@ -47,7 +53,7 @@ def parse_document(file_path: str | Path) -> "ParsedDocument":
     return doc
 
 
-def _parse_pdf(path: Path) -> "ParsedDocument":
+def _parse_pdf(path: Path) -> ParsedDocument:
     """Parse PDF using PyMuPDF with table detection.
 
     PyMuPDF extracts text page-by-page and can detect tables natively.
@@ -120,7 +126,7 @@ def _parse_pdf(path: Path) -> "ParsedDocument":
     )
 
 
-def _parse_docx(path: Path) -> "ParsedDocument":
+def _parse_docx(path: Path) -> ParsedDocument:
     """Parse DOCX using python-docx.
 
     Extracts paragraphs and tables, grouping content into logical sections.
@@ -198,7 +204,7 @@ def _parse_docx(path: Path) -> "ParsedDocument":
     )
 
 
-def _parse_csv(path: Path) -> "ParsedDocument":
+def _parse_csv(path: Path) -> ParsedDocument:
     """Parse CSV/XLSX into a single-page document with structured text.
 
     Converts tabular data into a text representation that preserves
@@ -250,7 +256,7 @@ def _parse_csv(path: Path) -> "ParsedDocument":
     )
 
 
-def _parse_txt(path: Path) -> "ParsedDocument":
+def _parse_txt(path: Path) -> ParsedDocument:
     """Parse plain text file, splitting into pages by line count."""
     from backend.models.document import ParsedDocument, ParsedPage
 

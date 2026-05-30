@@ -14,11 +14,11 @@ import base64
 from pathlib import Path
 
 import structlog
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
+from langchain_openai import ChatOpenAI
 
 from backend.config import settings
-from backend.models.document import ParsedDocument, ParsedPage
+from backend.models.document import ParsedDocument
 
 logger = structlog.get_logger()
 

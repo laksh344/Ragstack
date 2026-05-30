@@ -10,7 +10,7 @@ frontend can surface safety information per-message.
 import structlog
 
 from backend.agent.state import AgentState
-from backend.guardrails.hallucination import HallucinationDetector, HALLUCINATION_THRESHOLD
+from backend.guardrails.hallucination import HALLUCINATION_THRESHOLD, HallucinationDetector
 from backend.guardrails.input_validator import InputValidator
 from backend.guardrails.pii_redactor import PiiRedactor
 from backend.guardrails.token_budget import TokenBudget

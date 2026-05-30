@@ -5,14 +5,12 @@ Integration tests (actual network calls) belong in a separate suite run
 only when Docker services are available.
 """
 
-import pytest
 
 from backend.retrieval import SearchResult
-from backend.retrieval.hybrid import reciprocal_rank_fusion, _RRF_K
-from backend.retrieval.keyword_store import _hit_to_result, _MAX_BM25_SCORE
+from backend.retrieval.hybrid import _RRF_K, reciprocal_rank_fusion
+from backend.retrieval.keyword_store import _MAX_BM25_SCORE, _hit_to_result
 from backend.retrieval.reranker import _mark_reranked
 from backend.retrieval.vector_store import _build_filter, _point_to_result
-
 
 # ---------------------------------------------------------------------------
 # SearchResult model
@@ -106,7 +104,7 @@ class TestRRF:
 
 class TestVectorStoreHelpers:
     def test_build_filter_single(self):
-        from qdrant_client.models import Filter, FieldCondition
+        from qdrant_client.models import FieldCondition, Filter
 
         f = _build_filter({"source_file": "report.pdf"})
         assert isinstance(f, Filter)
@@ -217,6 +215,7 @@ class TestRerankerHelpers:
     def test_reranker_fallback_when_no_key(self, monkeypatch):
         """Reranker without API key returns fallback list synchronously."""
         import asyncio
+
         from backend.retrieval.reranker import Reranker
 
         monkeypatch.setattr("backend.config.settings.cohere_api_key", "")

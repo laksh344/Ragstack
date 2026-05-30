@@ -57,7 +57,8 @@ async def ingest_document(
         )
 
     # Save uploaded file to disk
-    upload_path = settings.upload_path / file.filename
+    filename = file.filename or "upload"
+    upload_path = settings.upload_path / filename
     try:
         with open(upload_path, "wb") as f:
             shutil.copyfileobj(file.file, f)
@@ -69,7 +70,10 @@ async def ingest_document(
         upload_path.unlink(missing_ok=True)
         raise HTTPException(
             status_code=400,
-            detail=f"File too large: {file_meta['file_size_mb']}MB (max: {settings.max_file_size_mb}MB)",
+            detail=(
+                f"File too large: {file_meta['file_size_mb']}MB "
+                f"(max: {settings.max_file_size_mb}MB)"
+            ),
         )
 
     logger.info(
@@ -132,7 +136,7 @@ async def ingest_document(
     total_chars = sum(c.char_count for c in chunks)
 
     result = IngestionResult(
-        source_file=file.filename,
+        source_file=filename,
         file_type=file_type.value,
         total_pages=parsed_doc.total_pages,
         total_chunks=len(chunks),

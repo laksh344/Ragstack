@@ -6,27 +6,24 @@ Presidio tests verify the regex fallback (Presidio may not be installed).
 
 import asyncio
 
-import pytest
-
-from backend.guardrails import PiiResult, ValidationResult, TokenUsage, EvalScore
-from backend.guardrails.pii_redactor import PiiRedactor, _REGEX_PATTERNS
-from backend.guardrails.input_validator import InputValidator, MAX_QUERY_LENGTH
-from backend.guardrails.token_budget import TokenBudget, _MODEL_PRICING
+from backend.guardrails import EvalScore, PiiResult, TokenUsage, ValidationResult
 from backend.guardrails.hallucination import (
-    HallucinationDetector,
     HALLUCINATION_THRESHOLD,
-    _split_sentences,
+    HallucinationDetector,
     _meaningful_words,
+    _split_sentences,
 )
+from backend.guardrails.input_validator import MAX_QUERY_LENGTH, InputValidator
+from backend.guardrails.pii_redactor import PiiRedactor
+from backend.guardrails.token_budget import _MODEL_PRICING, TokenBudget
+from backend.observability.datasets import load_golden_qa
 from backend.observability.evaluators import (
-    evaluate_retrieval_relevance,
-    evaluate_citation_accuracy,
     _overlap_faithfulness,
     _overlap_relevance,
     _words,
+    evaluate_citation_accuracy,
+    evaluate_retrieval_relevance,
 )
-from backend.observability.datasets import load_golden_qa
-
 
 # ---------------------------------------------------------------------------
 # Shared types

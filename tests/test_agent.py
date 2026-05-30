@@ -5,13 +5,11 @@ Guardrails logic is tested in test_guardrails.py; this file covers only the
 agent graph structure and routing / context-building helpers.
 """
 
-import pytest
 
-from backend.agent.state import AgentState
-from backend.agent.nodes.router import route_after_router
-from backend.agent.nodes.retriever import route_after_retrieval, _RELEVANCE_THRESHOLD
 from backend.agent.nodes.generator import _build_context
-
+from backend.agent.nodes.retriever import _RELEVANCE_THRESHOLD, route_after_retrieval
+from backend.agent.nodes.router import route_after_router
+from backend.agent.state import AgentState
 
 # ---------------------------------------------------------------------------
 # Helpers

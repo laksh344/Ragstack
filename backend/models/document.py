@@ -1,13 +1,13 @@
 """Data models for documents, chunks, and ingestion results."""
 
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
 
-class FileType(str, Enum):
+class FileType(StrEnum):
     PDF = "pdf"
     DOCX = "docx"
     CSV = "csv"
@@ -27,7 +27,7 @@ class FileType(str, Enum):
         return mapping.get(ext.lower(), cls.UNKNOWN)
 
 
-class ChunkingStrategy(str, Enum):
+class ChunkingStrategy(StrEnum):
     RECURSIVE = "recursive"
     SEMANTIC = "semantic"
 
@@ -91,7 +91,7 @@ class IngestionResult(BaseModel):
     estimated_tokens: int = 0
     processing_time_seconds: float = 0.0
     timestamp: str = Field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+        default_factory=lambda: datetime.now(UTC).isoformat()
     )
     errors: list[str] = Field(default_factory=list)
     vision_pages_processed: int = 0

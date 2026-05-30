@@ -13,6 +13,7 @@ Fallback (no API key or LLM call fails):
 """
 
 import re
+
 import structlog
 from pydantic import BaseModel
 
@@ -101,9 +102,10 @@ class HallucinationDetector:
             "For each sentence set grounded=true if it is supported, false if not."
         )
 
-        result: _JudgementList = await structured.ainvoke(
+        from typing import cast as _cast  # noqa: PLC0415
+        result = _cast(_JudgementList, await structured.ainvoke(
             [{"role": "user", "content": prompt}]
-        )
+        ))
 
         verdicts = [
             SentenceVerdict(
@@ -138,7 +140,9 @@ class HallucinationDetector:
 
     def _overlap_check(self, sentences: list[str], context: str) -> HallucinationResult:
         if not sentences:
-            return HallucinationResult(score=0.0, total_sentences=0, grounded_count=0, engine="overlap")
+            return HallucinationResult(
+                score=0.0, total_sentences=0, grounded_count=0, engine="overlap"
+            )
 
         ctx_words = _meaningful_words(context)
         verdicts: list[SentenceVerdict] = []

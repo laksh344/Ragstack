@@ -15,14 +15,14 @@ SSE event types emitted during streaming:
 
 import asyncio
 import json
-from datetime import datetime, timezone
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import structlog
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from pydantic import BaseModel
 
 from backend.agent.state import AgentState
@@ -92,7 +92,7 @@ async def submit_feedback(request: FeedbackRequest):
             mapping={
                 "rating": request.rating,
                 "comment": request.comment,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             },
         )
         await redis.expire(key, _FEEDBACK_TTL_SECONDS)
@@ -250,9 +250,9 @@ async def _append_message(redis, conversation_id: str, message: Message) -> None
 # ---------------------------------------------------------------------------
 
 
-def _to_langchain_messages(history: list[Message]):
+def _to_langchain_messages(history: list[Message]) -> list[BaseMessage]:
     """Convert stored Message objects to LangChain BaseMessage instances."""
-    out = []
+    out: list[BaseMessage] = []
     for m in history:
         if m.role == "user":
             out.append(HumanMessage(content=m.content))

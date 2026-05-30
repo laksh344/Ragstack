@@ -4,8 +4,8 @@ These are callable tool objects that nodes can invoke directly or that
 could be exposed to a ReAct-style agent in future iterations.
 """
 
-from langchain_core.tools import tool
 from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_core.tools import tool
 
 from backend.config import settings
 

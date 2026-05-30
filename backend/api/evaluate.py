@@ -5,7 +5,7 @@ GET  /api/v1/evaluate/results  — list stored eval run summaries
 """
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import structlog
@@ -104,7 +104,7 @@ async def list_results():
 
 def _result_path(run_id: str) -> Path:
     _RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     return _RESULTS_DIR / f"eval_{ts}_{run_id[:8]}.json"
 
 
@@ -112,7 +112,7 @@ def _persist_result(run_id: str, result: dict) -> None:
     path = _result_path(run_id)
     payload = {
         **result,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
     path.write_text(json.dumps(payload, indent=2))
     logger.info("evaluate.saved", path=str(path))

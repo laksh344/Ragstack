@@ -5,14 +5,12 @@ Embedding/store tests require Docker services running (integration tests).
 """
 
 import tempfile
-from pathlib import Path
 
 import pytest
 
-from backend.models.document import ChunkingStrategy, FileType, ParsedPage, ParsedDocument
 from backend.ingestion.chunker import chunk_document
 from backend.ingestion.metadata import extract_file_metadata
-
+from backend.models.document import ChunkingStrategy, FileType, ParsedDocument, ParsedPage
 
 # --- File type detection ---
 

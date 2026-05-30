@@ -4,12 +4,12 @@ Uses structured LLM output so the decision is always one of the four
 valid route values.  Chitchat and clarify routes skip retrieval entirely.
 """
 
-from typing import Literal
+from typing import Literal, cast
 
 import structlog
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from backend.agent.state import AgentState
 from backend.config import settings
@@ -42,17 +42,17 @@ async def router_node(state: AgentState) -> dict:
     """Classify query intent and set the route in state."""
     llm = ChatOpenAI(
         model=settings.openai_model,
-        api_key=settings.openai_api_key,
+        api_key=SecretStr(settings.openai_api_key),
         temperature=0,
     )
     structured = llm.with_structured_output(RouterDecision)
 
-    decision: RouterDecision = await structured.ainvoke(
+    decision = cast(RouterDecision, await structured.ainvoke(
         [
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user", "content": state["query"]},
         ]
-    )
+    ))
 
     logger.info(
         "router.decision",

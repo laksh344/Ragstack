@@ -65,7 +65,11 @@ def chunk_document(
             {
                 "document_title": document.title,
                 "total_chunks": len(chunks),
-                **{k: v for k, v in document.metadata.items() if isinstance(v, (str, int, float, bool))},
+                **{
+                    k: v
+                    for k, v in document.metadata.items()
+                    if isinstance(v, (str, int, float, bool))
+                },
             }
         )
 

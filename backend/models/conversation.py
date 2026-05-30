@@ -5,7 +5,7 @@ Conversations are logical groupings identified by a UUID that the
 client generates or receives on first contact.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -20,14 +20,14 @@ class Message(BaseModel):
     citations: list[Citation] = Field(default_factory=list)
     guardrail_flags: list[str] = Field(default_factory=list)
     timestamp: str = Field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+        default_factory=lambda: datetime.now(UTC).isoformat()
     )
 
 
 class Conversation(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
     created_at: str = Field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+        default_factory=lambda: datetime.now(UTC).isoformat()
     )
     messages: list[Message] = Field(default_factory=list)
     message_count: int = 0

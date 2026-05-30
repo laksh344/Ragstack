@@ -15,12 +15,12 @@ Import ``build_graph()`` to get the compiled graph, or use the module-level
 import structlog
 from langgraph.graph import END, START, StateGraph
 
-from backend.agent.state import AgentState
-from backend.agent.nodes.router import router_node, route_after_router
-from backend.agent.nodes.retriever import retriever_node, route_after_retrieval
-from backend.agent.nodes.web_search import web_search_node
 from backend.agent.nodes.generator import generator_node
 from backend.agent.nodes.guardrails import guardrails_node
+from backend.agent.nodes.retriever import retriever_node, route_after_retrieval
+from backend.agent.nodes.router import route_after_router, router_node
+from backend.agent.nodes.web_search import web_search_node
+from backend.agent.state import AgentState
 
 logger = structlog.get_logger()
 

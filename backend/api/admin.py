@@ -1,6 +1,6 @@
 """Admin endpoints — health check, stats, configuration."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter
 
@@ -13,7 +13,7 @@ router = APIRouter()
 async def health_check():
     return {
         "status": "healthy",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "version": "0.1.0",
         "services": {
             "qdrant": f"{settings.qdrant_host}:{settings.qdrant_port}",

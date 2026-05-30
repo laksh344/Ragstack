@@ -97,15 +97,14 @@ async def run_evaluation(
         Dict with "results" (per-question), "aggregate" (mean scores),
         and "run_id".
     """
-    from backend.agent.graph import graph          # deferred
+    from backend.agent.graph import graph  # deferred
     from backend.observability.evaluators import (  # deferred
-        evaluate_faithfulness,
         evaluate_answer_relevance,
-        evaluate_retrieval_relevance,
         evaluate_citation_accuracy,
+        evaluate_faithfulness,
+        evaluate_retrieval_relevance,
     )
 
-    cfg = config or {}
     items = examples or load_golden_qa()
     run_id = str(uuid4())
     results: list[dict] = []

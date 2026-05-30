@@ -6,9 +6,11 @@ and explicit citation list.  Handles clarify/chitchat routes with
 lightweight prompts that skip citation formatting entirely.
 """
 
+from typing import cast
+
 import structlog
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from backend.agent.state import AgentState, Citation
 from backend.config import settings
@@ -67,7 +69,7 @@ async def generator_node(state: AgentState) -> dict:
 
     llm = ChatOpenAI(
         model=settings.openai_model,
-        api_key=settings.openai_api_key,
+        api_key=SecretStr(settings.openai_api_key),
         temperature=0.2,
     )
 
@@ -89,12 +91,12 @@ async def _generate_rag_response(llm: ChatOpenAI, query: str, state: AgentState)
     context = _build_context(state)
     structured = llm.with_structured_output(GeneratedResponse)
 
-    result: GeneratedResponse = await structured.ainvoke(
+    result = cast(GeneratedResponse, await structured.ainvoke(
         [
             {"role": "system", "content": _RAG_SYSTEM},
             {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {query}"},
         ]
-    )
+    ))
 
     logger.info(
         "generator.rag_response",
@@ -109,23 +111,23 @@ async def _generate_rag_response(llm: ChatOpenAI, query: str, state: AgentState)
 
 async def _generate_clarification(llm: ChatOpenAI, query: str) -> dict:
     structured = llm.with_structured_output(SimpleResponse)
-    result: SimpleResponse = await structured.ainvoke(
+    result = cast(SimpleResponse, await structured.ainvoke(
         [
             {"role": "system", "content": _CLARIFY_SYSTEM},
             {"role": "user", "content": query},
         ]
-    )
+    ))
     return {"response": result.answer, "citations": []}
 
 
 async def _generate_chitchat(llm: ChatOpenAI, query: str) -> dict:
     structured = llm.with_structured_output(SimpleResponse)
-    result: SimpleResponse = await structured.ainvoke(
+    result = cast(SimpleResponse, await structured.ainvoke(
         [
             {"role": "system", "content": _CHITCHAT_SYSTEM},
             {"role": "user", "content": query},
         ]
-    )
+    ))
     return {"response": result.answer, "citations": []}
 
 

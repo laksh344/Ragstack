@@ -9,14 +9,14 @@ We separate concerns: Qdrant for vectors, ES for BM25.
 """
 
 import structlog
+from elasticsearch import Elasticsearch
+from langchain_openai import OpenAIEmbeddings
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
     PointStruct,
     VectorParams,
 )
-from elasticsearch import Elasticsearch
-from langchain_openai import OpenAIEmbeddings
 
 from backend.config import settings
 from backend.models.document import Chunk
@@ -202,7 +202,7 @@ class EmbeddingPipeline:
 
     def delete_by_source(self, source_file: str) -> dict:
         """Delete all chunks for a given source file from both stores."""
-        from qdrant_client.models import Filter, FieldCondition, MatchValue
+        from qdrant_client.models import FieldCondition, Filter, MatchValue
 
         # Delete from Qdrant
         self.qdrant.delete(

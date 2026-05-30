@@ -5,20 +5,19 @@ FastAPI route logic is tested by mocking the graph and Redis client.
 """
 
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
 from backend.api.chat import (
+    _MAX_HISTORY_MESSAGES,
     ChatRequest,
     FeedbackRequest,
     _sse,
     _to_langchain_messages,
-    _MAX_HISTORY_MESSAGES,
 )
 from backend.models.conversation import Conversation, Message
-
 
 # ---------------------------------------------------------------------------
 # Model tests

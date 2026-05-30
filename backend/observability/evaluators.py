@@ -14,6 +14,7 @@ All return an EvalScore(key, score 0-1, reasoning, passed).
 """
 
 import re
+
 import structlog
 from pydantic import BaseModel
 
@@ -143,7 +144,10 @@ def evaluate_retrieval_relevance(
 ) -> EvalScore:
     """Score how relevant the retrieved chunks are to the query (no LLM needed)."""
     if not chunks:
-        return EvalScore(key="retrieval_relevance", score=0.0, reasoning="no_chunks_retrieved", passed=False)
+        return EvalScore(
+            key="retrieval_relevance", score=0.0,
+            reasoning="no_chunks_retrieved", passed=False,
+        )
 
     q_words = _words(query)
     if not q_words:
@@ -220,9 +224,10 @@ async def _llm_judge(
         "Return a score between 0 and 1 and a one-sentence reasoning."
     )
 
-    result: _JudgeOutput = await structured.ainvoke(
+    from typing import cast as _cast  # noqa: PLC0415
+    result = _cast(_JudgeOutput, await structured.ainvoke(
         [{"role": "user", "content": user_content}]
-    )
+    ))
     clamped = round(max(0.0, min(1.0, result.score)), 3)
     logger.debug("evaluator.llm_judge", task=task, score=clamped)
     return clamped, result.reasoning

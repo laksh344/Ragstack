@@ -68,7 +68,11 @@ def trace_span(name: str, metadata: dict | None = None):
         yield   # tracing unavailable — run the code without a span
 
 
-def tag_request(user_id: str | None = None, dataset_id: str | None = None, model: str | None = None) -> None:
+def tag_request(
+    user_id: str | None = None,
+    dataset_id: str | None = None,
+    model: str | None = None,
+) -> None:
     """Attach standard per-request metadata to the active LangSmith trace."""
     meta: dict = {}
     if user_id:
