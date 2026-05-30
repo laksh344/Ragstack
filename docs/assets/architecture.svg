@@ -1,0 +1,166 @@
+<svg width="1320" height="820" viewBox="0 0 1320 820" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">RAGStack architecture</title>
+  <desc id="desc">A layered architecture diagram showing the frontend, FastAPI backend, LangGraph agent, ingestion pipeline, hybrid retrieval stores, observability, guardrails, and deployment infrastructure.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1320" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1220"/>
+      <stop offset="0.55" stop-color="#111827"/>
+      <stop offset="1" stop-color="#172033"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#10B981"/>
+      <stop offset="1" stop-color="#84CC16"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#020617" flood-opacity="0.35"/>
+    </filter>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" stroke="#334155" stroke-opacity="0.16" stroke-width="1"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+    </marker>
+    <style>
+      .title { font: 700 30px Arial, sans-serif; fill: #F8FAFC; }
+      .subtitle { font: 400 15px Arial, sans-serif; fill: #CBD5E1; }
+      .label { font: 700 17px Arial, sans-serif; fill: #F8FAFC; }
+      .small { font: 400 13px Arial, sans-serif; fill: #CBD5E1; }
+      .tiny { font: 700 11px Arial, sans-serif; fill: #E2E8F0; letter-spacing: .08em; }
+      .muted { font: 400 12px Arial, sans-serif; fill: #94A3B8; }
+      .chip { font: 700 11px Arial, sans-serif; fill: #E2E8F0; letter-spacing: .06em; }
+      .card { fill: #111827; stroke: #334155; stroke-width: 1.2; filter: url(#shadow); }
+      .panel { fill: #0F172A; stroke: #334155; stroke-width: 1; }
+      .line { stroke: #94A3B8; stroke-width: 2.2; marker-end: url(#arrow); }
+      .soft-line { stroke: #475569; stroke-width: 1.4; stroke-dasharray: 5 6; }
+    </style>
+  </defs>
+
+  <rect width="1320" height="820" rx="8" fill="url(#bg)"/>
+  <rect width="1320" height="820" fill="url(#grid)"/>
+
+  <rect x="42" y="36" width="1236" height="748" rx="8" fill="#0B1220" fill-opacity="0.66" stroke="#334155"/>
+  <text x="78" y="84" class="title">RAGStack Agentic RAG Platform</text>
+  <text x="78" y="112" class="subtitle">Document ingestion, hybrid retrieval, LangGraph reasoning, guardrails, and LangSmith observability in one production-ready flow.</text>
+
+  <g transform="translate(78 140)">
+    <rect width="154" height="30" rx="6" fill="#1E293B" stroke="#334155"/>
+    <circle cx="18" cy="15" r="6" fill="url(#blue)"/>
+    <text x="33" y="19" class="chip">MULTI-FORMAT</text>
+  </g>
+  <g transform="translate(248 140)">
+    <rect width="164" height="30" rx="6" fill="#1E293B" stroke="#334155"/>
+    <circle cx="18" cy="15" r="6" fill="url(#green)"/>
+    <text x="33" y="19" class="chip">HYBRID SEARCH</text>
+  </g>
+  <g transform="translate(428 140)">
+    <rect width="146" height="30" rx="6" fill="#1E293B" stroke="#334155"/>
+    <circle cx="18" cy="15" r="6" fill="url(#violet)"/>
+    <text x="33" y="19" class="chip">LANGGRAPH</text>
+  </g>
+  <g transform="translate(590 140)">
+    <rect width="150" height="30" rx="6" fill="#1E293B" stroke="#334155"/>
+    <circle cx="18" cy="15" r="6" fill="url(#amber)"/>
+    <text x="33" y="19" class="chip">GUARDRAILS</text>
+  </g>
+
+  <g id="app-layer">
+    <text x="78" y="218" class="tiny">APPLICATION LAYER</text>
+    <rect x="78" y="236" width="236" height="154" rx="8" class="card"/>
+    <rect x="78" y="236" width="236" height="7" rx="3.5" fill="url(#blue)"/>
+    <text x="105" y="273" class="label">Next.js Frontend</text>
+    <text x="105" y="304" class="small">Chat workspace</text>
+    <text x="105" y="329" class="small">Drag-and-drop upload</text>
+    <text x="105" y="354" class="small">Source citations panel</text>
+
+    <rect x="382" y="236" width="236" height="154" rx="8" class="card"/>
+    <rect x="382" y="236" width="236" height="7" rx="3.5" fill="url(#green)"/>
+    <text x="409" y="273" class="label">FastAPI Backend</text>
+    <text x="409" y="304" class="small">/ingest pipeline</text>
+    <text x="409" y="329" class="small">/chat streaming API</text>
+    <text x="409" y="354" class="small">/evaluate regression suite</text>
+
+    <rect x="686" y="236" width="296" height="154" rx="8" class="card"/>
+    <rect x="686" y="236" width="296" height="7" rx="3.5" fill="url(#violet)"/>
+    <text x="713" y="273" class="label">LangGraph Agent</text>
+    <text x="713" y="304" class="small">Router -> Retriever -> Generator</text>
+    <text x="713" y="329" class="small">Web fallback when context is weak</text>
+    <text x="713" y="354" class="small">Post-answer guardrail checks</text>
+
+    <rect x="1048" y="236" width="152" height="154" rx="8" class="panel"/>
+    <text x="1074" y="273" class="label">Users</text>
+    <text x="1074" y="304" class="small">Upload docs</text>
+    <text x="1074" y="329" class="small">Ask questions</text>
+    <text x="1074" y="354" class="small">Review sources</text>
+
+    <line x1="314" y1="313" x2="372" y2="313" class="line"/>
+    <line x1="618" y1="313" x2="676" y2="313" class="line"/>
+    <line x1="1048" y1="313" x2="992" y2="313" class="line"/>
+  </g>
+
+  <g id="ingestion">
+    <text x="78" y="444" class="tiny">INGESTION PIPELINE</text>
+    <rect x="78" y="462" width="214" height="100" rx="8" class="panel"/>
+    <text x="104" y="499" class="label">Parse</text>
+    <text x="104" y="529" class="small">PDF, DOCX, CSV, TXT</text>
+    <rect x="336" y="462" width="214" height="100" rx="8" class="panel"/>
+    <text x="362" y="499" class="label">Enrich + Chunk</text>
+    <text x="362" y="529" class="small">Vision, recursive, semantic</text>
+    <rect x="594" y="462" width="214" height="100" rx="8" class="panel"/>
+    <text x="620" y="499" class="label">Embed</text>
+    <text x="620" y="529" class="small">OpenAI / provider router</text>
+    <line x1="292" y1="512" x2="326" y2="512" class="line"/>
+    <line x1="550" y1="512" x2="584" y2="512" class="line"/>
+    <line x1="500" y1="390" x2="500" y2="452" class="line"/>
+  </g>
+
+  <g id="retrieval">
+    <text x="874" y="444" class="tiny">HYBRID RETRIEVAL</text>
+    <rect x="874" y="462" width="156" height="100" rx="8" class="panel"/>
+    <text x="902" y="499" class="label">Qdrant</text>
+    <text x="902" y="529" class="small">Vector search</text>
+    <rect x="1060" y="462" width="156" height="100" rx="8" class="panel"/>
+    <text x="1088" y="499" class="label">Elasticsearch</text>
+    <text x="1088" y="529" class="small">BM25 keywords</text>
+    <rect x="954" y="590" width="182" height="78" rx="8" class="card"/>
+    <rect x="954" y="590" width="182" height="7" rx="3.5" fill="url(#amber)"/>
+    <text x="984" y="626" class="label">RRF + Rerank</text>
+    <text x="984" y="654" class="small">Cohere / BGE fallback</text>
+    <line x1="808" y1="512" x2="864" y2="512" class="line"/>
+    <line x1="952" y1="562" x2="1010" y2="582" class="line"/>
+    <line x1="1138" y1="562" x2="1080" y2="582" class="line"/>
+    <line x1="954" y1="632" x2="834" y2="400" class="soft-line"/>
+  </g>
+
+  <g id="quality">
+    <text x="78" y="666" class="tiny">QUALITY AND OPERATIONS</text>
+    <rect x="78" y="684" width="322" height="82" rx="8" class="card"/>
+    <rect x="78" y="684" width="322" height="7" rx="3.5" fill="url(#amber)"/>
+    <text x="105" y="719" class="label">Guardrails</text>
+    <text x="105" y="746" class="small">PII redaction, injection checks</text>
+    <text x="105" y="763" class="small">Hallucination scoring</text>
+
+    <rect x="436" y="684" width="322" height="82" rx="8" class="card"/>
+    <rect x="436" y="684" width="322" height="7" rx="3.5" fill="url(#blue)"/>
+    <text x="463" y="719" class="label">LangSmith Observability</text>
+    <text x="463" y="746" class="small">Traces, eval datasets</text>
+    <text x="463" y="763" class="small">Faithfulness and citation metrics</text>
+
+    <rect x="794" y="684" width="422" height="82" rx="8" class="card"/>
+    <rect x="794" y="684" width="422" height="7" rx="3.5" fill="url(#green)"/>
+    <text x="821" y="719" class="label">Cloud-Native Delivery</text>
+    <text x="821" y="746" class="small">Docker Compose locally, GitHub Actions CI</text>
+    <text x="821" y="763" class="small">Terraform to GCP Cloud Run</text>
+  </g>
+</svg>
