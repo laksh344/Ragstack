@@ -108,3 +108,6 @@ class TokenBudget:
                 return tiktoken.get_encoding("cl100k_base")
         except ImportError:
             return None
+        except Exception as exc:
+            logger.warning("token_budget.encoder_unavailable", model=model, error=str(exc))
+            return None

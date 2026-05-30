@@ -5,6 +5,7 @@ and runs the evaluation suite against the live agent pipeline.
 """
 
 import json
+import os
 import time
 from pathlib import Path
 from uuid import uuid4
@@ -13,8 +14,28 @@ import structlog
 
 logger = structlog.get_logger()
 
-_GOLDEN_QA_PATH = Path(__file__).parent.parent.parent / "eval" / "datasets" / "golden_qa.json"
 _LANGSMITH_DATASET_NAME = "ragstack-golden-qa"
+_REL = ("eval", "datasets", "golden_qa.json")
+
+
+def _find_golden_qa() -> Path:
+    """Locate golden_qa.json across install layouts.
+
+    Robust to the package being imported from a source checkout (eval/ next to
+    backend/), an installed wheel in site-packages (eval/ is NOT shipped - use
+    the working directory), or a container WORKDIR. Honors RAGSTACK_EVAL_DIR.
+    """
+    candidates = []
+    env_dir = os.getenv("RAGSTACK_EVAL_DIR")
+    if env_dir:
+        candidates.append(Path(env_dir) / "datasets" / "golden_qa.json")
+    candidates.append(Path(__file__).resolve().parent.parent.parent.joinpath(*_REL))
+    candidates.append(Path.cwd().joinpath(*_REL))
+
+    for c in candidates:
+        if c.exists():
+            return c
+    return candidates[-2]  # source-relative default -> clear error on load
 
 
 # ---------------------------------------------------------------------------
@@ -23,11 +44,12 @@ _LANGSMITH_DATASET_NAME = "ragstack-golden-qa"
 
 def load_golden_qa() -> list[dict]:
     """Load the local golden QA dataset from disk."""
-    if not _GOLDEN_QA_PATH.exists():
-        raise FileNotFoundError(f"Golden QA dataset not found: {_GOLDEN_QA_PATH}")
-    with _GOLDEN_QA_PATH.open() as f:
+    path = _find_golden_qa()
+    if not path.exists():
+        raise FileNotFoundError(f"Golden QA dataset not found: {path}")
+    with path.open() as f:
         data = json.load(f)
-    logger.info("datasets.loaded", path=str(_GOLDEN_QA_PATH), count=len(data))
+    logger.info("datasets.loaded", path=str(path), count=len(data))
     return data
 
 
