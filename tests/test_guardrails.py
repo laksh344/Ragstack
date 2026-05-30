@@ -261,12 +261,16 @@ class TestHallucinationDetector:
         result = self.detector._overlap_check(sents, "revenue million dollars")
         assert result.engine == "overlap"
 
-    def test_async_check_uses_overlap_without_key(self, monkeypatch):
-        monkeypatch.setattr("backend.config.settings.openai_api_key", "")
+    def test_async_check_uses_overlap_without_llm(self, monkeypatch):
+        # Force llm_available() -> False so the detector uses the overlap path
+        # regardless of which provider/keys are configured. Keeps the test
+        # hermetic (no network calls).
+        monkeypatch.setattr("backend.utils.providers.llm_available", lambda: False)
         context  = "The revenue is ten million dollars for this quarter."
         response = "The revenue is ten million dollars."
         result = asyncio.run(self.detector.check(response, context, use_llm=True))
         assert isinstance(result.score, float)
+        assert result.engine == "overlap"
 
 
 class TestSplitSentences:

@@ -9,11 +9,11 @@ lightweight prompts that skip citation formatting entirely.
 from typing import cast
 
 import structlog
-from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, SecretStr
+from langchain_core.language_models import BaseChatModel
+from pydantic import BaseModel
 
 from backend.agent.state import AgentState, Citation
-from backend.config import settings
+from backend.utils.providers import get_llm
 
 logger = structlog.get_logger()
 
@@ -67,11 +67,7 @@ async def generator_node(state: AgentState) -> dict:
     route = state.get("route", "knowledge_base")
     query = state["query"]
 
-    llm = ChatOpenAI(
-        model=settings.openai_model,
-        api_key=SecretStr(settings.openai_api_key),
-        temperature=0.2,
-    )
+    llm = get_llm(temperature=0.2)
 
     if route == "clarify":
         return await _generate_clarification(llm, query)
@@ -87,7 +83,7 @@ async def generator_node(state: AgentState) -> dict:
 # ---------------------------------------------------------------------------
 
 
-async def _generate_rag_response(llm: ChatOpenAI, query: str, state: AgentState) -> dict:
+async def _generate_rag_response(llm: BaseChatModel, query: str, state: AgentState) -> dict:
     context = _build_context(state)
     structured = llm.with_structured_output(GeneratedResponse)
 
@@ -109,7 +105,7 @@ async def _generate_rag_response(llm: ChatOpenAI, query: str, state: AgentState)
     }
 
 
-async def _generate_clarification(llm: ChatOpenAI, query: str) -> dict:
+async def _generate_clarification(llm: BaseChatModel, query: str) -> dict:
     structured = llm.with_structured_output(SimpleResponse)
     result = cast(SimpleResponse, await structured.ainvoke(
         [
@@ -120,7 +116,7 @@ async def _generate_clarification(llm: ChatOpenAI, query: str) -> dict:
     return {"response": result.answer, "citations": []}
 
 
-async def _generate_chitchat(llm: ChatOpenAI, query: str) -> dict:
+async def _generate_chitchat(llm: BaseChatModel, query: str) -> dict:
     structured = llm.with_structured_output(SimpleResponse)
     result = cast(SimpleResponse, await structured.ainvoke(
         [

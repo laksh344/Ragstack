@@ -92,8 +92,10 @@ async def ingest_document(
         raise HTTPException(status_code=422, detail=f"Failed to parse document: {e}")
 
     # --- Vision enrichment (optional) ---
+    # Vision uses GPT-4o multimodal; only attempt it when OpenAI is the
+    # configured provider and a key is present.
     vision_pages = 0
-    if use_vision and settings.openai_api_key:
+    if use_vision and settings.llm_provider == "openai" and settings.openai_api_key:
         try:
             visual_pages = [p for p in parsed_doc.pages if p.has_tables or p.has_images]
             if visual_pages:

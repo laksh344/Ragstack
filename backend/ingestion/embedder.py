@@ -10,7 +10,6 @@ We separate concerns: Qdrant for vectors, ES for BM25.
 
 import structlog
 from elasticsearch import Elasticsearch
-from langchain_openai import OpenAIEmbeddings
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
@@ -20,6 +19,7 @@ from qdrant_client.models import (
 
 from backend.config import settings
 from backend.models.document import Chunk
+from backend.utils.providers import get_embedding_dimensions, get_embeddings
 
 logger = structlog.get_logger()
 
@@ -31,10 +31,7 @@ class EmbeddingPipeline:
     """Manages embedding generation and dual-store persistence."""
 
     def __init__(self):
-        self.embeddings = OpenAIEmbeddings(
-            model=settings.embedding_model,
-            api_key=settings.openai_api_key,
-        )
+        self.embeddings = get_embeddings()
         self.qdrant = QdrantClient(
             host=settings.qdrant_host,
             port=settings.qdrant_port,
@@ -43,18 +40,39 @@ class EmbeddingPipeline:
         self._ensure_stores()
 
     def _ensure_stores(self):
-        """Create Qdrant collection and ES index if they don't exist."""
-        # Qdrant collection
+        """Create Qdrant collection and ES index if they don't exist.
+
+        If a collection already exists with a different vector dimension than
+        the configured embedding provider produces (e.g. after switching
+        provider), it is recreated. This is safe because vectors of the wrong
+        dimension cannot be queried against the new embeddings anyway.
+        """
+        dim = get_embedding_dimensions()
+
+        # Qdrant collection — recreate if the vector size no longer matches.
         collections = [c.name for c in self.qdrant.get_collections().collections]
+        if settings.qdrant_collection in collections:
+            existing_dim = self._existing_vector_size()
+            if existing_dim is not None and existing_dim != dim:
+                logger.warning(
+                    "embedder.qdrant_dim_mismatch",
+                    collection=settings.qdrant_collection,
+                    existing=existing_dim,
+                    expected=dim,
+                )
+                self.qdrant.delete_collection(settings.qdrant_collection)
+                collections.remove(settings.qdrant_collection)
+
         if settings.qdrant_collection not in collections:
             self.qdrant.create_collection(
                 collection_name=settings.qdrant_collection,
-                vectors_config=VectorParams(
-                    size=settings.embedding_dimensions,
-                    distance=Distance.COSINE,
-                ),
+                vectors_config=VectorParams(size=dim, distance=Distance.COSINE),
             )
-            logger.info("embedder.qdrant_created", collection=settings.qdrant_collection)
+            logger.info(
+                "embedder.qdrant_created",
+                collection=settings.qdrant_collection,
+                dimensions=dim,
+            )
 
         # Elasticsearch index
         if not self.es.indices.exists(index=settings.es_index):
@@ -90,6 +108,16 @@ class EmbeddingPipeline:
                 },
             )
             logger.info("embedder.es_created", index=settings.es_index)
+
+    def _existing_vector_size(self) -> int | None:
+        """Return the vector dimension of the existing Qdrant collection."""
+        try:
+            info = self.qdrant.get_collection(settings.qdrant_collection)
+            vectors = info.config.params.vectors
+            # Single unnamed vector → VectorParams with .size
+            return getattr(vectors, "size", None)
+        except Exception:
+            return None
 
     async def embed_and_store(self, chunks: list[Chunk]) -> dict:
         """Embed all chunks and store in both Qdrant and Elasticsearch.
@@ -191,7 +219,8 @@ class EmbeddingPipeline:
             "qdrant": {
                 "collection": settings.qdrant_collection,
                 "points_count": qdrant_info.points_count,
-                "vectors_count": qdrant_info.vectors_count,
+                "vectors_count": getattr(qdrant_info, "vectors_count", None)
+                or qdrant_info.points_count,
                 "status": qdrant_info.status.value,
             },
             "elasticsearch": {

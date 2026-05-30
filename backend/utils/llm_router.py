@@ -1,29 +1,27 @@
-"""Multi-provider LLM routing.
+"""Multi-provider LLM routing (compatibility shim).
 
-Supports OpenAI, Anthropic, and Google Gemini with
-configurable fallback chains.
+The real provider logic lives in backend.utils.providers. This module is
+kept for backwards compatibility — it delegates to providers.get_llm so any
+older imports of get_llm continue to work.
 """
 
-from langchain_openai import ChatOpenAI
+from __future__ import annotations
 
-from backend.config import settings
+from typing import TYPE_CHECKING
+
+from backend.utils.providers import get_llm as _get_llm
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 
 
 def get_llm(
     model: str | None = None,
     temperature: float = 0,
-    max_tokens: int = 4096,
     streaming: bool = False,
-) -> ChatOpenAI:
-    """Get a configured LLM instance.
+) -> BaseChatModel:
+    """Return a configured chat model for the active provider.
 
-    Currently defaults to OpenAI. Extend with Anthropic/Gemini
-    by adding provider detection on the model string.
+    See backend.utils.providers.get_llm for the full implementation.
     """
-    return ChatOpenAI(
-        model=model or settings.openai_model,
-        api_key=settings.openai_api_key,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        streaming=streaming,
-    )
+    return _get_llm(temperature=temperature, streaming=streaming, model=model)

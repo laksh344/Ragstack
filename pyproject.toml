@@ -18,6 +18,8 @@ dependencies = [
     # LangChain ecosystem
     "langchain>=0.3.0",
     "langchain-openai>=0.2.0",
+    "langchain-google-genai>=2.0.0",
+    "langchain-cohere>=0.3.0",
     "langchain-community>=0.3.0",
     "langchain-experimental>=0.3.0",
     "langgraph>=0.2.0",
@@ -94,6 +96,7 @@ no_implicit_optional = true
 [[tool.mypy.overrides]]
 module = [
     "backend.guardrails.pii_redactor",
+    "backend.utils.providers",
     "backend.utils.llm_router",
     "backend.ingestion.vision",
     "backend.ingestion.embedder",

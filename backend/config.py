@@ -8,11 +8,21 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    # --- LLM Providers ---
+    # --- Provider selection ---
+    # Which backend powers the chat LLM and the embeddings.
+    # Options: "openai" | "google" | "cohere"
+    llm_provider: str = "google"
+    embedding_provider: str = "google"
+
+    # --- OpenAI ---
     openai_api_key: str = ""
     openai_model: str = "gpt-4o"
     embedding_model: str = "text-embedding-3-small"
-    embedding_dimensions: int = 1536
+
+    # --- Google Gemini ---
+    google_api_key: str = ""
+    google_model: str = "gemini-2.5-flash"
+    google_embedding_model: str = "models/gemini-embedding-001"
 
     # --- LangSmith ---
     langchain_tracing_v2: bool = True
@@ -21,6 +31,8 @@ class Settings(BaseSettings):
 
     # --- Cohere ---
     cohere_api_key: str = ""
+    cohere_model: str = "command-r"
+    cohere_embedding_model: str = "embed-english-v3.0"
 
     # --- Tavily ---
     tavily_api_key: str = ""

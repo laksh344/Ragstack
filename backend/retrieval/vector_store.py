@@ -1,12 +1,12 @@
 """Qdrant vector store — semantic search via cosine similarity."""
 
 import structlog
-from langchain_openai import OpenAIEmbeddings
 from qdrant_client import QdrantClient
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 from backend.config import settings
 from backend.retrieval import SearchResult
+from backend.utils.providers import get_embeddings
 
 logger = structlog.get_logger()
 
@@ -19,10 +19,7 @@ class VectorStore:
             host=settings.qdrant_host,
             port=settings.qdrant_port,
         )
-        self._embeddings = OpenAIEmbeddings(
-            model=settings.embedding_model,
-            api_key=settings.openai_api_key,
-        )
+        self._embeddings = get_embeddings()
         self._collection = settings.qdrant_collection
 
     async def search(
@@ -42,15 +39,16 @@ class VectorStore:
         vector = await self._embeddings.aembed_query(query)
         qdrant_filter = _build_filter(filters) if filters else None
 
-        hits = self._client.search(
+        # qdrant-client >= 1.12 uses query_points (the old .search is removed).
+        response = self._client.query_points(
             collection_name=self._collection,
-            query_vector=vector,
+            query=vector,
             query_filter=qdrant_filter,
             limit=k,
             with_payload=True,
         )
 
-        results = [_point_to_result(hit) for hit in hits]
+        results = [_point_to_result(hit) for hit in response.points]
         logger.debug("vector_store.search", query_len=len(query), hits=len(results))
         return results
 
@@ -60,7 +58,7 @@ class VectorStore:
         return {
             "collection": self._collection,
             "points_count": info.points_count,
-            "vectors_count": info.vectors_count,
+            "vectors_count": getattr(info, "vectors_count", None) or info.points_count,
             "status": info.status.value,
         }
 

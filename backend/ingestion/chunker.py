@@ -145,12 +145,10 @@ def _semantic_chunk(
     """
     try:
         from langchain_experimental.text_splitter import SemanticChunker
-        from langchain_openai import OpenAIEmbeddings
 
-        embeddings = OpenAIEmbeddings(
-            model=settings.embedding_model,
-            api_key=settings.openai_api_key,
-        )
+        from backend.utils.providers import get_embeddings
+
+        embeddings = get_embeddings()
 
         semantic_splitter = SemanticChunker(
             embeddings=embeddings,

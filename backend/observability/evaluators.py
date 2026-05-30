@@ -45,9 +45,9 @@ async def evaluate_faithfulness(
     use_llm: bool = True,
 ) -> EvalScore:
     """Score how well the response is supported by retrieved context."""
-    from backend.config import settings  # deferred
+    from backend.utils.providers import llm_available  # deferred
 
-    if use_llm and settings.openai_api_key and context.strip():
+    if use_llm and llm_available() and context.strip():
         try:
             score, reasoning = await _llm_judge(
                 query=query,
@@ -60,7 +60,6 @@ async def evaluate_faithfulness(
                     "0.0 if the response contradicts or ignores the context. "
                     "Penalise fabricated facts not in the context."
                 ),
-                settings=settings,
             )
         except Exception as exc:
             logger.warning("evaluator.faithfulness.llm_error", error=str(exc))
@@ -95,9 +94,9 @@ async def evaluate_answer_relevance(
     use_llm: bool = True,
 ) -> EvalScore:
     """Score how directly the response addresses the query."""
-    from backend.config import settings  # deferred
+    from backend.utils.providers import llm_available  # deferred
 
-    if use_llm and settings.openai_api_key:
+    if use_llm and llm_available():
         try:
             score, reasoning = await _llm_judge(
                 query=query,
@@ -109,7 +108,6 @@ async def evaluate_answer_relevance(
                     "Score 1.0 if the response fully addresses the question; "
                     "0.0 if it is off-topic or does not answer at all."
                 ),
-                settings=settings,
             )
         except Exception as exc:
             logger.warning("evaluator.answer_relevance.llm_error", error=str(exc))
@@ -204,15 +202,10 @@ async def _llm_judge(
     context: str,
     task: str,
     prompt: str,
-    settings,
 ) -> tuple[float, str]:
-    from langchain_openai import ChatOpenAI  # noqa: PLC0415
+    from backend.utils.providers import get_llm  # noqa: PLC0415
 
-    llm = ChatOpenAI(
-        model=settings.openai_model,
-        api_key=settings.openai_api_key,
-        temperature=0,
-    )
+    llm = get_llm(temperature=0)
     structured = llm.with_structured_output(_JudgeOutput)
 
     ctx_block = f"\n\nCONTEXT:\n{context[:4000]}" if context else ""

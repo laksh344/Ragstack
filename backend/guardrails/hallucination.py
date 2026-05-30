@@ -65,11 +65,11 @@ class HallucinationDetector:
         if not sentences:
             return HallucinationResult(score=0.0, total_sentences=0, grounded_count=0)
 
-        from backend.config import settings  # deferred
+        from backend.utils.providers import llm_available  # deferred
 
-        if use_llm and settings.openai_api_key:
+        if use_llm and llm_available():
             try:
-                return await self._llm_check(sentences, context, settings)
+                return await self._llm_check(sentences, context)
             except Exception as exc:
                 logger.warning("hallucination.llm_fallback", error=str(exc))
 
@@ -80,15 +80,11 @@ class HallucinationDetector:
     # ------------------------------------------------------------------
 
     async def _llm_check(
-        self, sentences: list[str], context: str, settings
+        self, sentences: list[str], context: str
     ) -> HallucinationResult:
-        from langchain_openai import ChatOpenAI  # noqa: PLC0415
+        from backend.utils.providers import get_llm  # noqa: PLC0415
 
-        llm = ChatOpenAI(
-            model=settings.openai_model,
-            api_key=settings.openai_api_key,
-            temperature=0,
-        )
+        llm = get_llm(temperature=0)
         structured = llm.with_structured_output(_JudgementList)
 
         truncated_ctx = context[:_MAX_CONTEXT_CHARS]

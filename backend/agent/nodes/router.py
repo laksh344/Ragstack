@@ -8,11 +8,10 @@ from typing import Literal, cast
 
 import structlog
 from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel
 
 from backend.agent.state import AgentState
-from backend.config import settings
+from backend.utils.providers import get_llm
 
 logger = structlog.get_logger()
 
@@ -40,11 +39,7 @@ Respond with the intent and a one-sentence reasoning.
 
 async def router_node(state: AgentState) -> dict:
     """Classify query intent and set the route in state."""
-    llm = ChatOpenAI(
-        model=settings.openai_model,
-        api_key=SecretStr(settings.openai_api_key),
-        temperature=0,
-    )
+    llm = get_llm(temperature=0)
     structured = llm.with_structured_output(RouterDecision)
 
     decision = cast(RouterDecision, await structured.ainvoke(
