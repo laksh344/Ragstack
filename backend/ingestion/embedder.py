@@ -277,26 +277,31 @@ class EmbeddingPipeline:
 
     def delete_by_source(self, source_file: str) -> dict:
         """Delete all chunks for a given source file from both stores."""
-        from qdrant_client.models import FieldCondition, Filter, MatchValue
+        from qdrant_client.models import (
+            FieldCondition,
+            Filter,
+            FilterSelector,
+            MatchValue,
+        )
 
-        # Delete from Qdrant
+        flt = Filter(
+            must=[FieldCondition(key="source_file", match=MatchValue(value=source_file))]
+        )
+
+        # Delete from Qdrant. qdrant-client >= 1.12 takes points_selector
+        # (a FilterSelector), not the old points_filter kwarg.
         self.qdrant.delete(
             collection_name=settings.qdrant_collection,
-            points_filter=Filter(
-                must=[
-                    FieldCondition(
-                        key="source_file",
-                        match=MatchValue(value=source_file),
-                    )
-                ]
-            ),
+            points_selector=FilterSelector(filter=flt),
         )
 
         # Delete from Elasticsearch
-        self.es.delete_by_query(
+        es_result = self.es.delete_by_query(
             index=settings.es_index,
             body={"query": {"term": {"source_file": source_file}}},
+            refresh=True,
         )
 
-        logger.info("embedder.deleted", source_file=source_file)
-        return {"deleted_source": source_file}
+        deleted = es_result.get("deleted", 0)
+        logger.info("embedder.deleted", source_file=source_file, es_deleted=deleted)
+        return {"deleted_source": source_file, "chunks_deleted": deleted}

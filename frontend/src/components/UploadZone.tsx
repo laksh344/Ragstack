@@ -20,6 +20,8 @@ export default function UploadZone() {
   const [records,   setRecords]   = useState<UploadRecord[]>([]);
   const [documents, setDocuments] = useState<DocumentInfo[]>([]);
   const [loadingDocs, setLoadingDocs] = useState(true);
+  const [deleting,  setDeleting]  = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [dragOver,  setDragOver]  = useState(false);
   const [strategy,  setStrategy]  = useState<"recursive" | "semantic">("recursive");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -93,9 +95,18 @@ export default function UploadZone() {
 
   const handleDelete = useCallback(
     async (sourceFile: string) => {
-      setDocuments((prev) => prev.filter((d) => d.source_file !== sourceFile));
-      await deleteDocument(sourceFile);
-      refreshDocuments();
+      setDeleteError(null);
+      setDeleting(sourceFile);
+      try {
+        await deleteDocument(sourceFile);
+        // Only refresh from the server after a confirmed delete.
+        await refreshDocuments();
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setDeleteError(`Failed to delete "${sourceFile}": ${msg}`);
+      } finally {
+        setDeleting(null);
+      }
     },
     [refreshDocuments]
   );
@@ -178,6 +189,10 @@ export default function UploadZone() {
           </h3>
         </div>
 
+        {deleteError && (
+          <p className="text-xs text-red-500 mb-2">{deleteError}</p>
+        )}
+
         {loadingDocs ? (
           <div className="flex items-center gap-2 text-sm text-faint py-4">
             <Loader2 size={14} className="animate-spin" /> Loading documents…
@@ -189,7 +204,12 @@ export default function UploadZone() {
         ) : (
           <ul className="space-y-2">
             {documents.map((doc) => (
-              <DocumentRow key={doc.source_file} doc={doc} onDelete={handleDelete} />
+              <DocumentRow
+                key={doc.source_file}
+                doc={doc}
+                onDelete={handleDelete}
+                deleting={deleting === doc.source_file}
+              />
             ))}
           </ul>
         )}
@@ -201,9 +221,11 @@ export default function UploadZone() {
 function DocumentRow({
   doc,
   onDelete,
+  deleting,
 }: {
   doc: DocumentInfo;
   onDelete: (sourceFile: string) => void;
+  deleting: boolean;
 }) {
   return (
     <li className="group flex items-center gap-3 rounded-xl bg-surface border border-edge px-4 py-3">
@@ -218,10 +240,11 @@ function DocumentRow({
       </div>
       <button
         onClick={() => onDelete(doc.source_file)}
-        className="shrink-0 text-faint hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+        disabled={deleting}
+        className="shrink-0 text-faint hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-100"
         title="Remove from knowledge base"
       >
-        <Trash2 size={15} />
+        {deleting ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
       </button>
     </li>
   );

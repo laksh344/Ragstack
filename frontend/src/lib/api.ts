@@ -119,7 +119,13 @@ export async function listDocuments(): Promise<DocumentInfo[]> {
 }
 
 export async function deleteDocument(sourceFile: string): Promise<void> {
-  await fetch(`${BASE}/ingest/${encodeURIComponent(sourceFile)}`, { method: "DELETE" });
+  const res = await fetch(`${BASE}/ingest/${encodeURIComponent(sourceFile)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || "Delete failed");
+  }
 }
 
 // ---------------------------------------------------------------------------
