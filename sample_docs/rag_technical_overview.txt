@@ -1,0 +1,124 @@
+Retrieval-Augmented Generation: A Technical Overview
+
+1. Introduction
+
+Retrieval-Augmented Generation (RAG) is an AI framework that enhances large language models
+by incorporating external knowledge sources. Rather than relying solely on the parametric
+knowledge encoded during training, RAG systems retrieve relevant documents at inference time
+and use them as context for generation. This approach significantly reduces hallucinations
+and enables the model to access up-to-date information.
+
+2. Architecture Components
+
+2.1 Document Ingestion Pipeline
+
+The ingestion pipeline is responsible for processing raw documents into searchable chunks.
+This involves several stages: parsing (extracting text from various formats), chunking
+(splitting text into manageable segments), embedding (converting text to vector representations),
+and indexing (storing vectors and metadata for efficient retrieval).
+
+Parsing must handle diverse formats including PDF, DOCX, CSV, HTML, and plain text.
+Each format presents unique challenges — PDFs may contain tables and images that require
+special handling, while DOCX files have complex XML structures with embedded formatting.
+
+2.2 Chunking Strategies
+
+The choice of chunking strategy significantly impacts retrieval quality. Common approaches include:
+
+Fixed-size chunking: Split text into chunks of a predetermined character or token count.
+Simple and fast, but may split sentences or paragraphs unnaturally.
+
+Recursive character splitting: Attempt to split on natural boundaries (paragraphs, then
+sentences, then words) before falling back to character-level splits. This preserves
+semantic coherence within chunks.
+
+Semantic chunking: Use embedding similarity to detect topic shifts within a document,
+placing chunk boundaries where the semantic content changes. This produces variable-size
+chunks that align with natural topic boundaries.
+
+2.3 Embedding Models
+
+Text embeddings convert natural language into dense vector representations that capture
+semantic meaning. Modern embedding models like OpenAI's text-embedding-3-small produce
+1536-dimensional vectors. These vectors enable similarity search — semantically similar
+texts produce vectors that are close together in the embedding space.
+
+Key considerations for embedding model selection include: dimensionality (higher dimensions
+capture more nuance but require more storage), multilingual support, maximum input length,
+and cost per token.
+
+2.4 Vector Databases
+
+Vector databases are optimized for storing and searching high-dimensional vectors.
+Popular options include Qdrant, Pinecone, Weaviate, Milvus, and ChromaDB. These databases
+support approximate nearest neighbor (ANN) search algorithms like HNSW that enable
+millisecond-level similarity search across millions of vectors.
+
+Most vector databases also support metadata filtering, allowing queries like "find similar
+documents published after 2024" by combining vector similarity with structured filters.
+
+2.5 Hybrid Search
+
+Pure vector search excels at semantic similarity but can miss exact keyword matches.
+BM25 keyword search (used by Elasticsearch) handles exact terms, acronyms, and IDs well
+but lacks semantic understanding. Hybrid search combines both approaches using techniques
+like Reciprocal Rank Fusion (RRF), which merges ranked results from both systems without
+requiring score normalization.
+
+2.6 Reranking
+
+Initial retrieval typically returns more candidates than needed, ranked by a lightweight
+scoring function. Cross-encoder rerankers (like Cohere Rerank or BGE-reranker) then
+score each query-document pair jointly, producing much more accurate relevance judgments.
+This two-stage approach balances efficiency (fast initial retrieval) with precision
+(accurate reranking of a smaller candidate set).
+
+3. Agent-Based RAG
+
+Modern RAG systems increasingly incorporate agentic behavior — the ability to plan,
+reason, and execute multi-step tasks autonomously. Rather than a fixed retrieve-then-generate
+pipeline, an agent can:
+
+- Decide whether to search the knowledge base, search the web, or ask for clarification
+- Evaluate retrieval quality and retry with reformulated queries if results are insufficient
+- Combine information from multiple sources before generating a response
+- Apply guardrails and safety checks at each step
+
+Frameworks like LangGraph enable building these agent workflows as state machines with
+conditional edges, making the decision logic explicit and debuggable.
+
+4. Evaluation and Observability
+
+Production RAG systems require continuous evaluation across multiple dimensions:
+
+Faithfulness: Are generated answers grounded in the retrieved context?
+Answer relevance: Does the response actually address the user's question?
+Retrieval relevance: Are the retrieved chunks relevant to the query?
+Citation accuracy: Do source references correctly point to supporting evidence?
+
+Tools like LangSmith provide end-to-end tracing of RAG pipelines, allowing developers
+to inspect every step from query to response, identify bottlenecks, and run evaluation
+datasets for regression testing.
+
+5. Guardrails
+
+Responsible AI deployment requires multiple safety layers:
+
+PII detection and redaction: Identifying and masking personally identifiable information
+in both inputs and outputs using tools like Microsoft Presidio.
+
+Hallucination detection: Verifying that generated claims are supported by the retrieved
+context, typically using an LLM-as-judge approach.
+
+Prompt injection defense: Detecting and blocking attempts to manipulate the LLM's behavior
+through crafted inputs.
+
+Token budget controls: Tracking and limiting API costs per request, session, and user.
+
+6. Conclusion
+
+Building a production RAG system requires careful attention to every stage of the pipeline,
+from document parsing through retrieval to generation and safety. The most impactful
+improvements often come not from model selection but from retrieval quality — better
+chunking, hybrid search, and reranking consistently outperform larger or newer models
+in RAG benchmarks.

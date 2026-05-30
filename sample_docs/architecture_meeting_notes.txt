@@ -1,0 +1,38 @@
+RAGStack Architecture Review — Meeting Notes
+Date: March 15, 2026
+Attendees: Engineering Team (Laksh, Sarah, Mike, Priya)
+
+DECISIONS MADE:
+
+1. Vector Database Selection
+   We evaluated Qdrant, Pinecone, and Weaviate for our vector storage needs.
+   Decision: Qdrant (self-hosted via Docker)
+   Rationale: Best metadata filtering, no vendor lock-in, generous free tier,
+   and excellent Python SDK. Pinecone was ruled out due to cloud-only deployment.
+
+2. Chunking Strategy
+   After A/B testing with our evaluation dataset:
+   - Recursive splitting: 78% retrieval relevance on golden QA set
+   - Semantic chunking: 84% retrieval relevance, but 3x slower ingestion
+   Decision: Default to recursive (fast), offer semantic as option for research docs.
+
+3. Reranking Pipeline
+   Tested with and without Cohere reranking on 100 queries:
+   - Without reranker: 71% answer faithfulness
+   - With Cohere rerank: 89% answer faithfulness
+   Decision: Always rerank. The 200ms latency increase is worth the quality gain.
+
+4. Agent Architecture
+   Debated between single-pass RAG and agentic RAG with LangGraph:
+   - Single-pass: simpler, 400ms average response time
+   - Agentic: handles edge cases (insufficient context, ambiguous queries), 800ms avg
+   Decision: Agentic. The ability to fall back to web search and self-evaluate
+   retrieval quality is critical for production reliability.
+
+ACTION ITEMS:
+- Laksh: Implement hybrid search with RRF fusion by Friday
+- Sarah: Set up LangSmith evaluation datasets with 50 golden QA pairs
+- Mike: Deploy Qdrant + Elasticsearch on GCP with Terraform
+- Priya: Build PII detection pipeline using Presidio
+
+NEXT MEETING: March 22, 2026 — Sprint review and demo preparation

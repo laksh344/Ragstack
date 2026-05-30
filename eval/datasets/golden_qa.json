@@ -1,0 +1,162 @@
+[
+  {
+    "id": "qa_001",
+    "question": "What is Retrieval-Augmented Generation?",
+    "expected_answer": "RAG is an AI framework that enhances large language models by retrieving relevant documents at inference time and using them as context for generation, reducing hallucinations and enabling access to up-to-date information.",
+    "source_doc": "rag_technical_overview.txt",
+    "difficulty": "easy",
+    "category": "definition"
+  },
+  {
+    "id": "qa_002",
+    "question": "What are the three main chunking strategies described in the technical overview?",
+    "expected_answer": "Fixed-size chunking, recursive character splitting, and semantic chunking.",
+    "source_doc": "rag_technical_overview.txt",
+    "difficulty": "easy",
+    "category": "factual"
+  },
+  {
+    "id": "qa_003",
+    "question": "Why was Qdrant chosen over Pinecone for the vector database?",
+    "expected_answer": "Qdrant was chosen because it offers the best metadata filtering, no vendor lock-in, a generous free tier, and an excellent Python SDK. Pinecone was ruled out due to its cloud-only deployment model.",
+    "source_doc": "architecture_meeting_notes.txt",
+    "difficulty": "medium",
+    "category": "reasoning"
+  },
+  {
+    "id": "qa_004",
+    "question": "What improvement did adding Cohere reranking provide to answer faithfulness?",
+    "expected_answer": "Cohere reranking improved answer faithfulness from 71% to 89%, an 18 percentage point improvement, with only a 200ms latency increase.",
+    "source_doc": "architecture_meeting_notes.txt",
+    "difficulty": "medium",
+    "category": "factual"
+  },
+  {
+    "id": "qa_005",
+    "question": "What is the difference between recursive and semantic chunking in terms of retrieval relevance?",
+    "expected_answer": "Recursive splitting achieved 78% retrieval relevance while semantic chunking achieved 84%, but semantic chunking was 3x slower during ingestion.",
+    "source_doc": "architecture_meeting_notes.txt",
+    "difficulty": "medium",
+    "category": "comparison"
+  },
+  {
+    "id": "qa_006",
+    "question": "How does hybrid search work and why is it better than pure vector search?",
+    "expected_answer": "Hybrid search combines vector similarity search with BM25 keyword search using Reciprocal Rank Fusion. It is better because vector search misses exact keyword matches while BM25 lacks semantic understanding — combining both covers both weaknesses.",
+    "source_doc": "rag_technical_overview.txt",
+    "difficulty": "medium",
+    "category": "reasoning"
+  },
+  {
+    "id": "qa_007",
+    "question": "What are the four evaluation dimensions for production RAG systems?",
+    "expected_answer": "Faithfulness (answers grounded in context), answer relevance (addresses the question), retrieval relevance (relevant chunks retrieved), and citation accuracy (correct source references).",
+    "source_doc": "rag_technical_overview.txt",
+    "difficulty": "easy",
+    "category": "factual"
+  },
+  {
+    "id": "qa_008",
+    "question": "What rate limits does the RAGStack Pro tier have?",
+    "expected_answer": "Pro tier allows 1000 requests per hour with a maximum file size of 50MB.",
+    "source_doc": "api_documentation.txt",
+    "difficulty": "easy",
+    "category": "factual"
+  },
+  {
+    "id": "qa_009",
+    "question": "Who was assigned to implement hybrid search with RRF fusion and by when?",
+    "expected_answer": "Laksh was assigned to implement hybrid search with RRF fusion by Friday.",
+    "source_doc": "architecture_meeting_notes.txt",
+    "difficulty": "easy",
+    "category": "factual"
+  },
+  {
+    "id": "qa_010",
+    "question": "What are the guardrail layers mentioned and what tools are used for PII detection?",
+    "expected_answer": "The guardrail layers include PII detection and redaction, hallucination detection, prompt injection defense, and token budget controls. Microsoft Presidio is used for PII detection.",
+    "source_doc": "rag_technical_overview.txt",
+    "difficulty": "medium",
+    "category": "factual"
+  },
+  {
+    "id": "qa_011",
+    "question": "Considering both the technical overview and the meeting notes, what evidence supports the team's decision to use agentic RAG over single-pass RAG?",
+    "expected_answer": "The technical overview describes agents as able to decide between knowledge base search, web search, and clarification, evaluate retrieval quality, and combine multi-source information. The meeting notes confirm this — agentic RAG handles edge cases like insufficient context and ambiguous queries, which was deemed critical for production reliability despite the ~400ms latency increase.",
+    "source_doc": "multi_doc",
+    "difficulty": "hard",
+    "category": "multi_doc_reasoning"
+  },
+  {
+    "id": "qa_012",
+    "question": "Cross-referencing the API docs and technical overview, how does the /ingest endpoint implement the chunking strategies described in the architecture?",
+    "expected_answer": "The /ingest endpoint accepts a chunking_strategy parameter ('recursive' or 'semantic') that maps to the two strategies in the technical overview. Recursive splitting uses natural boundaries while semantic uses embedding similarity. The endpoint also accepts chunk_size and chunk_overlap parameters for fine-tuning.",
+    "source_doc": "multi_doc",
+    "difficulty": "hard",
+    "category": "multi_doc_reasoning"
+  },
+  {
+    "id": "qa_013",
+    "question": "How do the evaluation metrics from the meeting notes relate to the evaluation endpoint in the API?",
+    "expected_answer": "The meeting notes report specific metrics like 78% vs 84% retrieval relevance and 71% vs 89% faithfulness. The /evaluate API endpoint returns these same metric types — faithfulness, answer_relevance, retrieval_relevance, citation_accuracy — enabling automated A/B comparison of configurations like the team performed manually.",
+    "source_doc": "multi_doc",
+    "difficulty": "hard",
+    "category": "multi_doc_reasoning"
+  },
+  {
+    "id": "qa_014",
+    "question": "Which RAGStack product had the highest revenue in Q3 2025 in the Asia Pacific region?",
+    "expected_answer": "This requires looking up the quarterly revenue data for Q3 2025 in Asia Pacific across all products to find the maximum.",
+    "source_doc": "quarterly_revenue.csv",
+    "difficulty": "hard",
+    "category": "data_lookup"
+  },
+  {
+    "id": "qa_015",
+    "question": "What is the total revenue across all products and regions for Q1 2024?",
+    "expected_answer": "This requires summing all revenue_usd values where quarter is Q1 2024.",
+    "source_doc": "quarterly_revenue.csv",
+    "difficulty": "hard",
+    "category": "data_aggregation"
+  },
+  {
+    "id": "qa_016",
+    "question": "What is the current stock price of NVIDIA?",
+    "expected_answer": "OUT_OF_SCOPE: This information is not in the knowledge base. The system should indicate it cannot answer this from the available documents.",
+    "source_doc": "none",
+    "difficulty": "boundary",
+    "category": "out_of_scope"
+  },
+  {
+    "id": "qa_017",
+    "question": "What is the weather forecast for tomorrow?",
+    "expected_answer": "OUT_OF_SCOPE: This is a real-time information request not covered by the knowledge base.",
+    "source_doc": "none",
+    "difficulty": "boundary",
+    "category": "out_of_scope"
+  },
+  {
+    "id": "qa_018",
+    "question": "Who is the CEO of RAGStack?",
+    "expected_answer": "OUT_OF_SCOPE: The documents do not contain information about company leadership.",
+    "source_doc": "none",
+    "difficulty": "boundary",
+    "category": "out_of_scope"
+  },
+  {
+    "id": "qa_019",
+    "question": "Can you write Python code to implement a RAG pipeline?",
+    "expected_answer": "OUT_OF_SCOPE: This is a code generation request, not a knowledge retrieval query.",
+    "source_doc": "none",
+    "difficulty": "boundary",
+    "category": "out_of_scope"
+  },
+  {
+    "id": "qa_020",
+    "question": "What happened in the board meeting last Tuesday?",
+    "expected_answer": "OUT_OF_SCOPE: There are no board meeting notes in the knowledge base. The available meeting notes are from the March 15, 2026 architecture review.",
+    "source_doc": "none",
+    "difficulty": "boundary",
+    "category": "out_of_scope"
+  }
+]

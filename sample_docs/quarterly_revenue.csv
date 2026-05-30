@@ -1,0 +1,129 @@
+quarter,product,region,revenue_usd,units_sold,growth_pct
+Q1 2024,RAGStack Pro,North America,449895,4681,4.7
+Q1 2024,RAGStack Pro,Europe,236769,3152,19.4
+Q1 2024,RAGStack Pro,Asia Pacific,246639,1110,2.7
+Q1 2024,RAGStack Pro,Latin America,105500,4828,13.0
+Q1 2024,RAGStack Enterprise,North America,498880,3172,-2.8
+Q1 2024,RAGStack Enterprise,Europe,485158,2509,1.7
+Q1 2024,RAGStack Enterprise,Asia Pacific,196983,4871,20.0
+Q1 2024,RAGStack Enterprise,Latin America,209763,4994,19.3
+Q1 2024,RAGStack Cloud,North America,461695,3639,12.5
+Q1 2024,RAGStack Cloud,Europe,480518,3338,13.5
+Q1 2024,RAGStack Cloud,Asia Pacific,79424,2711,16.5
+Q1 2024,RAGStack Cloud,Latin America,280947,1576,-4.8
+Q1 2024,RAGStack API,North America,72718,1482,10.0
+Q1 2024,RAGStack API,Europe,92064,2371,11.3
+Q1 2024,RAGStack API,Asia Pacific,462695,4305,7.8
+Q1 2024,RAGStack API,Latin America,182886,4517,4.7
+Q2 2024,RAGStack Pro,North America,463871,3069,-3.9
+Q2 2024,RAGStack Pro,Europe,497234,513,12.7
+Q2 2024,RAGStack Pro,Asia Pacific,381039,195,8.6
+Q2 2024,RAGStack Pro,Latin America,281959,3275,1.3
+Q2 2024,RAGStack Enterprise,North America,151361,2204,-1.5
+Q2 2024,RAGStack Enterprise,Europe,148532,1354,23.4
+Q2 2024,RAGStack Enterprise,Asia Pacific,484981,1332,24.8
+Q2 2024,RAGStack Enterprise,Latin America,344800,2560,-3.7
+Q2 2024,RAGStack Cloud,North America,375030,4136,20.8
+Q2 2024,RAGStack Cloud,Europe,445216,3160,2.7
+Q2 2024,RAGStack Cloud,Asia Pacific,496733,856,5.2
+Q2 2024,RAGStack Cloud,Latin America,93682,2497,18.0
+Q2 2024,RAGStack API,North America,155130,2983,19.0
+Q2 2024,RAGStack API,Europe,488058,1503,11.8
+Q2 2024,RAGStack API,Asia Pacific,320121,3736,13.8
+Q2 2024,RAGStack API,Latin America,129906,1848,-0.3
+Q3 2024,RAGStack Pro,North America,382618,3250,19.6
+Q3 2024,RAGStack Pro,Europe,98556,4769,0.0
+Q3 2024,RAGStack Pro,Asia Pacific,489362,1305,23.4
+Q3 2024,RAGStack Pro,Latin America,179867,1946,-1.5
+Q3 2024,RAGStack Enterprise,North America,109838,1097,11.7
+Q3 2024,RAGStack Enterprise,Europe,288090,3323,-0.9
+Q3 2024,RAGStack Enterprise,Asia Pacific,401742,4207,-4.8
+Q3 2024,RAGStack Enterprise,Latin America,254021,1922,-2.3
+Q3 2024,RAGStack Cloud,North America,343071,1777,12.4
+Q3 2024,RAGStack Cloud,Europe,425846,139,11.2
+Q3 2024,RAGStack Cloud,Asia Pacific,248111,822,2.8
+Q3 2024,RAGStack Cloud,Latin America,173827,3945,5.1
+Q3 2024,RAGStack API,North America,399134,4742,12.7
+Q3 2024,RAGStack API,Europe,451409,1890,9.5
+Q3 2024,RAGStack API,Asia Pacific,261948,4384,14.7
+Q3 2024,RAGStack API,Latin America,164624,1311,8.9
+Q4 2024,RAGStack Pro,North America,92093,2083,-2.0
+Q4 2024,RAGStack Pro,Europe,104403,2808,11.0
+Q4 2024,RAGStack Pro,Asia Pacific,89982,2841,15.9
+Q4 2024,RAGStack Pro,Latin America,417997,2099,-2.3
+Q4 2024,RAGStack Enterprise,North America,278605,1354,1.9
+Q4 2024,RAGStack Enterprise,Europe,112045,617,5.2
+Q4 2024,RAGStack Enterprise,Asia Pacific,179118,4235,0.6
+Q4 2024,RAGStack Enterprise,Latin America,364346,3859,21.5
+Q4 2024,RAGStack Cloud,North America,450032,430,21.1
+Q4 2024,RAGStack Cloud,Europe,137832,3951,10.6
+Q4 2024,RAGStack Cloud,Asia Pacific,158933,2488,22.2
+Q4 2024,RAGStack Cloud,Latin America,241029,689,15.2
+Q4 2024,RAGStack API,North America,439470,2639,9.4
+Q4 2024,RAGStack API,Europe,108474,4153,6.6
+Q4 2024,RAGStack API,Asia Pacific,253105,3739,-3.0
+Q4 2024,RAGStack API,Latin America,372529,3790,-4.3
+Q1 2025,RAGStack Pro,North America,85257,1645,12.6
+Q1 2025,RAGStack Pro,Europe,251958,4606,14.1
+Q1 2025,RAGStack Pro,Asia Pacific,151392,3666,9.0
+Q1 2025,RAGStack Pro,Latin America,282778,3503,9.0
+Q1 2025,RAGStack Enterprise,North America,232029,1579,1.8
+Q1 2025,RAGStack Enterprise,Europe,190014,1293,7.4
+Q1 2025,RAGStack Enterprise,Asia Pacific,491065,1405,-0.2
+Q1 2025,RAGStack Enterprise,Latin America,147895,4737,3.1
+Q1 2025,RAGStack Cloud,North America,148821,4292,21.7
+Q1 2025,RAGStack Cloud,Europe,425337,4569,-2.6
+Q1 2025,RAGStack Cloud,Asia Pacific,287490,1854,19.9
+Q1 2025,RAGStack Cloud,Latin America,109685,2065,9.3
+Q1 2025,RAGStack API,North America,233528,1036,-4.4
+Q1 2025,RAGStack API,Europe,188826,1777,4.5
+Q1 2025,RAGStack API,Asia Pacific,112366,1531,-4.7
+Q1 2025,RAGStack API,Latin America,365285,249,6.7
+Q2 2025,RAGStack Pro,North America,300686,2104,11.1
+Q2 2025,RAGStack Pro,Europe,401517,2541,24.6
+Q2 2025,RAGStack Pro,Asia Pacific,221330,770,16.4
+Q2 2025,RAGStack Pro,Latin America,414298,4092,-0.2
+Q2 2025,RAGStack Enterprise,North America,283989,837,5.5
+Q2 2025,RAGStack Enterprise,Europe,237611,3949,-2.9
+Q2 2025,RAGStack Enterprise,Asia Pacific,253980,4064,-0.9
+Q2 2025,RAGStack Enterprise,Latin America,99459,2718,6.5
+Q2 2025,RAGStack Cloud,North America,150548,767,10.2
+Q2 2025,RAGStack Cloud,Europe,158771,1880,-1.3
+Q2 2025,RAGStack Cloud,Asia Pacific,64558,3434,-3.8
+Q2 2025,RAGStack Cloud,Latin America,364364,550,7.1
+Q2 2025,RAGStack API,North America,431316,2859,11.5
+Q2 2025,RAGStack API,Europe,299981,4049,15.0
+Q2 2025,RAGStack API,Asia Pacific,387390,388,19.2
+Q2 2025,RAGStack API,Latin America,435251,3110,6.6
+Q3 2025,RAGStack Pro,North America,409217,4832,24.3
+Q3 2025,RAGStack Pro,Europe,210319,2137,19.7
+Q3 2025,RAGStack Pro,Asia Pacific,92125,4510,22.1
+Q3 2025,RAGStack Pro,Latin America,195836,973,-2.8
+Q3 2025,RAGStack Enterprise,North America,285199,4605,11.6
+Q3 2025,RAGStack Enterprise,Europe,417629,2124,20.6
+Q3 2025,RAGStack Enterprise,Asia Pacific,107360,1223,23.6
+Q3 2025,RAGStack Enterprise,Latin America,489829,1933,11.2
+Q3 2025,RAGStack Cloud,North America,375875,2292,-2.0
+Q3 2025,RAGStack Cloud,Europe,95073,1112,-4.6
+Q3 2025,RAGStack Cloud,Asia Pacific,185393,963,24.6
+Q3 2025,RAGStack Cloud,Latin America,437022,4168,5.4
+Q3 2025,RAGStack API,North America,434721,2100,21.7
+Q3 2025,RAGStack API,Europe,278176,3670,21.8
+Q3 2025,RAGStack API,Asia Pacific,486006,841,17.1
+Q3 2025,RAGStack API,Latin America,255440,2520,8.4
+Q4 2025,RAGStack Pro,North America,226177,2432,3.8
+Q4 2025,RAGStack Pro,Europe,373534,863,12.7
+Q4 2025,RAGStack Pro,Asia Pacific,215011,174,7.9
+Q4 2025,RAGStack Pro,Latin America,384560,1197,20.2
+Q4 2025,RAGStack Enterprise,North America,65243,246,6.1
+Q4 2025,RAGStack Enterprise,Europe,239984,1449,-0.2
+Q4 2025,RAGStack Enterprise,Asia Pacific,275876,920,-0.2
+Q4 2025,RAGStack Enterprise,Latin America,66071,2413,0.2
+Q4 2025,RAGStack Cloud,North America,239998,523,2.1
+Q4 2025,RAGStack Cloud,Europe,279431,3333,6.2
+Q4 2025,RAGStack Cloud,Asia Pacific,162633,1313,18.6
+Q4 2025,RAGStack Cloud,Latin America,108992,4746,0.1
+Q4 2025,RAGStack API,North America,487698,4193,13.6
+Q4 2025,RAGStack API,Europe,173623,2781,-3.7
+Q4 2025,RAGStack API,Asia Pacific,494805,230,10.2
+Q4 2025,RAGStack API,Latin America,420137,1925,13.8

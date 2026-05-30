@@ -1,0 +1,105 @@
+RAGStack API Documentation v0.1.0
+
+BASE URL: https://api.ragstack.dev/api/v1
+
+AUTHENTICATION:
+All API requests require a Bearer token in the Authorization header.
+Example: Authorization: Bearer sk-ragstack-xxxx
+
+RATE LIMITS:
+- Free tier: 100 requests/hour, 10MB max file size
+- Pro tier: 1000 requests/hour, 50MB max file size
+- Enterprise: Custom limits, SLA guarantees
+
+ENDPOINTS:
+
+1. POST /ingest
+   Upload and process a document through the RAG pipeline.
+
+   Request (multipart/form-data):
+     - file (required): Document file (PDF, DOCX, CSV, TXT)
+     - chunking_strategy (optional): "recursive" or "semantic" (default: "recursive")
+     - chunk_size (optional): Characters per chunk (default: 1000)
+     - chunk_overlap (optional): Overlap between chunks (default: 200)
+     - use_vision (optional): Enable GPT-4o vision for tables/images (default: true)
+
+   Response:
+     {
+       "document_id": "uuid",
+       "source_file": "report.pdf",
+       "total_pages": 42,
+       "total_chunks": 156,
+       "chunking_strategy": "recursive",
+       "avg_chunk_size": 876.3,
+       "processing_time_seconds": 12.4,
+       "vision_pages_processed": 8
+     }
+
+   Error Codes:
+     400 - Unsupported file type or file too large
+     422 - Document could not be parsed or produced no chunks
+     500 - Internal processing error
+
+2. POST /chat
+   Send a query to the agentic RAG system.
+
+   Request:
+     {
+       "query": "What were the key decisions from the architecture review?",
+       "dataset_id": "optional-dataset-filter",
+       "conversation_id": "optional-for-multi-turn",
+       "stream": true
+     }
+
+   Response (streaming):
+     Each SSE event contains a chunk of the response with citation metadata.
+
+   Response (non-streaming):
+     {
+       "response": "The architecture review resulted in four key decisions...",
+       "citations": [
+         {
+           "source_file": "architecture_meeting_notes.txt",
+           "page_number": 1,
+           "chunk_text": "...",
+           "relevance_score": 0.94
+         }
+       ],
+       "agent_trace": {
+         "route": "knowledge_base",
+         "retrieval_count": 5,
+         "reranked": true,
+         "guardrails_passed": true
+       }
+     }
+
+3. POST /evaluate
+   Run the evaluation suite against a dataset.
+
+   Request:
+     {
+       "dataset_name": "golden_qa",
+       "config": {
+         "chunking_strategy": "semantic",
+         "use_reranker": true
+       }
+     }
+
+   Response:
+     {
+       "faithfulness": 0.89,
+       "answer_relevance": 0.92,
+       "retrieval_relevance": 0.85,
+       "citation_accuracy": 0.91,
+       "avg_latency_ms": 1240,
+       "total_queries": 20
+     }
+
+4. GET /ingest/stats
+   Get current statistics from vector and keyword stores.
+
+5. DELETE /ingest/{source_file}
+   Remove all chunks for a document from both stores.
+
+6. GET /health
+   Health check endpoint.
